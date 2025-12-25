@@ -1,0 +1,128 @@
+version: '3.8'
+
+services:
+  max-backend:
+    build:
+      context: ./max-backend
+      dockerfile: Dockerfile
+    container_name: max-backend
+    restart: unless-stopped
+    ports:
+      - "3005:3005"
+    environment:
+      - NODE_ENV=production
+      - PORT=3005
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_SERVICE_KEY=${SUPABASE_SERVICE_KEY}
+      - SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - AI_MODEL_SIMPLE=${AI_MODEL_SIMPLE:-gpt-4o-mini-2024-07-18}
+      - AI_MODEL_COMPLEX=${AI_MODEL_COMPLEX:-gpt-4o}
+      - ESPO_BASE_URL=http://espocrm:80/api/v1
+      - ESPO_API_KEY=${ESPO_API_KEY}
+      - ESPO_USERNAME=${ESPO_USERNAME}
+      - ESPO_PASSWORD=${ESPO_PASSWORD}
+      - GREENAPI_BASE_URL=https://api.green-api.com
+      - GREENAPI_INSTANCE_ID=${GREENAPI_INSTANCE_ID}
+      - GREENAPI_API_TOKEN=${GREENAPI_API_TOKEN}
+      - MAX_BASE_URL=https://api.max.studiomacrea.cloud
+      - JWT_SECRET=${JWT_SECRET}
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+      - SMTP_FROM=${SMTP_FROM}
+      - TOKENS_BUDGET_TOTAL=${TOKENS_BUDGET_TOTAL:-20000000}
+    volumes:
+      - max-logs:/app/logs
+      - max-conversations:/app/conversations
+      - max-data:/app/data
+    networks:
+      - max-network
+    depends_on:
+      - espocrm
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3005/api/health', (r) => process.exit(r.statusCode === 200 ? 0 : 1))"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  espocrm:
+    build:
+      context: ./espocrm
+      dockerfile: Dockerfile
+    container_name: espocrm
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    environment:
+      - ESPOCRM_DATABASE_HOST=mariadb
+      - ESPOCRM_DATABASE_NAME=espocrm
+      - ESPOCRM_DATABASE_USER=espocrm
+      - ESPOCRM_DATABASE_PASSWORD=${ESPO_DB_PASSWORD}
+      - ESPOCRM_ADMIN_USERNAME=${ESPO_USERNAME}
+      - ESPOCRM_ADMIN_PASSWORD=${ESPO_PASSWORD}
+      - ESPOCRM_SITE_URL=https://crm.studiomacrea.cloud
+    volumes:
+      - espocrm-data:/var/www/html
+    networks:
+      - max-network
+    depends_on:
+      - mariadb
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/api/v1/App/user"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  mariadb:
+    image: mariadb:10.11
+    container_name: mariadb
+    restart: unless-stopped
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=espocrm
+      - MYSQL_USER=espocrm
+      - MYSQL_PASSWORD=${ESPO_DB_PASSWORD}
+    volumes:
+      - mariadb-data:/var/lib/mysql
+    networks:
+      - max-network
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - nginx-logs:/var/log/nginx
+    networks:
+      - max-network
+    depends_on:
+      - max-backend
+      - espocrm
+
+networks:
+  max-network:
+    driver: bridge
+
+volumes:
+  max-logs:
+  max-conversations:
+  max-data:
+  espocrm-data:
+  mariadb-data:
+  nginx-logs:
