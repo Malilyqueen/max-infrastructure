@@ -47,7 +47,7 @@ docker compose logs -f max-backend
 
 ## Services
 
-- **MAX Backend**: `http://localhost:3005` → `https://api.max.studiomacrea.cloud`
+- **MAX Backend**: `http://localhost:3005` → `https://max-api.studiomacrea.cloud`
 - **EspoCRM**: `http://localhost:8080` → `https://crm.studiomacrea.cloud`
 - **MariaDB**: Internal only (:3306)
 - **Nginx**: Reverse proxy with HTTPS (:80, :443)
@@ -82,7 +82,7 @@ JWT_SECRET=...
    - Restart: `docker compose restart max-backend`
 
 2. **Configure Green-API Webhook**:
-   - URL: `https://api.max.studiomacrea.cloud/webhooks/greenapi`
+   - URL: `https://max-api.studiomacrea.cloud/webhooks/greenapi`
 
 3. **Rebuild EspoCRM**:
    ```bash
@@ -130,7 +130,7 @@ Supabase (External)
 ## DNS Configuration
 
 Cloudflare DNS → Proxied:
-- `api.max.studiomacrea.cloud` → `51.159.170.20`
+- `max-api.studiomacrea.cloud` → `51.159.170.20`
 - `crm.studiomacrea.cloud` → `51.159.170.20`
 
 SSL/TLS: **Full (strict)**

@@ -14,7 +14,7 @@
 
 ---
 
-## Étape 2: Configurer api.max.studiomacrea.cloud
+## Étape 2: Configurer max-api.studiomacrea.cloud
 
 ### Créer un nouvel enregistrement A
 
@@ -23,7 +23,7 @@
 | Champ | Valeur |
 |-------|--------|
 | Type | **A** |
-| Name | **api.max** |
+| Name | **max-api** |
 | IPv4 address | **51.159.170.20** |
 | Proxy status | **✅ Proxied** (nuage orange) |
 | TTL | **Auto** |
@@ -89,7 +89,7 @@ Après configuration, vous devriez avoir:
 ```
 Type    Name        Target/Value            Proxy
 ────────────────────────────────────────────────────
-A       api.max     51.159.170.20          ✅ Proxied
+A       max-api     51.159.170.20          ✅ Proxied
 CNAME   max         cname.vercel-dns.com   ✅ Proxied
 A       crm         51.159.170.20          ✅ Proxied
 ```
@@ -103,7 +103,7 @@ A       crm         51.159.170.20          ✅ Proxied
 Ouvrir PowerShell et exécuter:
 
 ```powershell
-nslookup api.max.studiomacrea.cloud
+nslookup max-api.studiomacrea.cloud
 ```
 
 **Résultat attendu**: Une ou plusieurs adresses IP Cloudflare (104.x.x.x ou 172.x.x.x)
@@ -111,7 +111,7 @@ nslookup api.max.studiomacrea.cloud
 ### Test 2: Tester l'API Health
 
 ```powershell
-curl -I https://api.max.studiomacrea.cloud/api/health
+curl -I https://max-api.studiomacrea.cloud/api/health
 ```
 
 **Résultat attendu**:
@@ -173,7 +173,7 @@ ls -la nginx/ssl/
 
 ## 📞 Étapes suivantes après DNS OK
 
-Une fois que `api.max.studiomacrea.cloud` répond:
+Une fois que `max-api.studiomacrea.cloud` répond:
 
 1. ✅ **Générer certificat SSL Cloudflare Origin** (voir DEPLOYMENT_CHECKLIST.md section 2)
 2. ✅ **Uploader le code MAX Backend** (section 3)

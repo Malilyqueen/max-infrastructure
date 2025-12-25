@@ -74,14 +74,14 @@
 
 **Action Required**: Configure DNS in Cloudflare Dashboard
 
-#### A. Add api.max.studiomacrea.cloud
+#### A. Add max-api.studiomacrea.cloud
 
 1. Login to Cloudflare Dashboard
 2. Select domain: `studiomacrea.cloud`
 3. Go to DNS → Records → Add record
 4. Configuration:
    - **Type**: A
-   - **Name**: `api.max` (or `api.max.studiomacrea.cloud`)
+   - **Name**: `max-api` (or `max-api.studiomacrea.cloud`)
    - **IPv4 address**: `51.159.170.20`
    - **Proxy status**: ✅ Proxied (orange cloud)
    - **TTL**: Auto
@@ -318,10 +318,10 @@ vercel domains add max.studiomacrea.cloud
 # Set environment variables in Vercel Dashboard
 # OR via CLI:
 vercel env add VITE_API_BASE production
-# When prompted, enter: https://api.max.studiomacrea.cloud
+# When prompted, enter: https://max-api.studiomacrea.cloud
 
 vercel env add VITE_API_URL production
-# When prompted, enter: https://api.max.studiomacrea.cloud
+# When prompted, enter: https://max-api.studiomacrea.cloud
 
 vercel env add VITE_X_TENANT production
 # When prompted, enter: macrea
@@ -356,7 +356,7 @@ vercel --prod
 
 2. **Configure Webhook**:
    - Settings → Webhooks
-   - **Webhook URL**: `https://api.max.studiomacrea.cloud/webhooks/greenapi`
+   - **Webhook URL**: `https://max-api.studiomacrea.cloud/webhooks/greenapi`
    - **Events**: Check "incomingMessageReceived"
    - Save
 
@@ -403,7 +403,7 @@ git push -u origin main
 **After DNS propagation** (5-10 minutes):
 
 ```bash
-curl -I https://api.max.studiomacrea.cloud/api/health
+curl -I https://max-api.studiomacrea.cloud/api/health
 ```
 
 **Expected**: `HTTP/2 200`
@@ -418,7 +418,7 @@ curl -I https://api.max.studiomacrea.cloud/api/health
 
 **Check**:
 - Browser console: No CORS errors
-- Network tab: API calls to `https://api.max.studiomacrea.cloud`
+- Network tab: API calls to `https://max-api.studiomacrea.cloud`
 
 ---
 
@@ -533,14 +533,14 @@ docker compose up -d
 
 ## 🆘 Troubleshooting
 
-### Issue: "Could not resolve host: api.max.studiomacrea.cloud"
+### Issue: "Could not resolve host: max-api.studiomacrea.cloud"
 
 **Cause**: DNS not configured or not propagated yet
 
 **Fix**:
 1. Check Cloudflare DNS records
 2. Wait 5-10 minutes for propagation
-3. Test with `nslookup api.max.studiomacrea.cloud`
+3. Test with `nslookup max-api.studiomacrea.cloud`
 
 ---
 
@@ -588,21 +588,21 @@ docker compose restart espocrm
 | Service | URL | Status |
 |---------|-----|--------|
 | Frontend MAX | https://max.studiomacrea.cloud | ⏳ Pending Vercel deploy |
-| Backend API | https://api.max.studiomacrea.cloud | ⏳ Pending DNS config |
+| Backend API | https://max-api.studiomacrea.cloud | ⏳ Pending DNS config |
 | EspoCRM | https://crm.studiomacrea.cloud | ✅ Working |
-| API Health | https://api.max.studiomacrea.cloud/api/health | ⏳ Pending DNS config |
-| Green-API Webhook | https://api.max.studiomacrea.cloud/webhooks/greenapi | ⏳ Pending DNS config |
+| API Health | https://max-api.studiomacrea.cloud/api/health | ⏳ Pending DNS config |
+| Green-API Webhook | https://max-api.studiomacrea.cloud/webhooks/greenapi | ⏳ Pending DNS config |
 
 ---
 
 ## 🎯 Next Immediate Action
 
-**Priority 1**: Configure Cloudflare DNS for `api.max.studiomacrea.cloud`
+**Priority 1**: Configure Cloudflare DNS for `max-api.studiomacrea.cloud`
 
 1. Login to Cloudflare
-2. Add A record: `api.max` → `51.159.170.20` (proxied)
+2. Add A record: `max-api` → `51.159.170.20` (proxied)
 3. Wait 5-10 minutes
-4. Test: `curl -I https://api.max.studiomacrea.cloud/api/health`
+4. Test: `curl -I https://max-api.studiomacrea.cloud/api/health`
 
 Once DNS works, proceed with steps 2-9 in order.
 
