@@ -40,5 +40,32 @@ volumes/
 conversations/
 sessions/
 
+# ============================================================================
+# RUNTIME ARTIFACTS (BACKEND)
+# ============================================================================
+max-backend/node_modules/
+max-backend/dist/
+max-backend/uploads/
+max-backend/logs/
+max-backend/conversations/
+max-backend/sessions/
+max-backend/tmp/
+max-backend/*.log
+max-backend/.schema_state.json
+max-backend/.env
+max-backend/.env.*
+
+# ============================================================================
+# TEMP / BACKUP FILES
+# ============================================================================
+*.bak
+*.backup
+*.backup.*
+*.old
+*.tmp
+*.swp
+*.swo
+*~
+
 .DS_Store
 Thumbs.db
