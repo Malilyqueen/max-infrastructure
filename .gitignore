@@ -1,11 +1,28 @@
+# ============================================================================
+# SECRETS & CREDENTIALS
+# ============================================================================
 .env
+.env.*
+!.env.example
 .env.production
 .env.local
 
+# Certificats SSL
 nginx/ssl/*.pem
 nginx/ssl/*.key
 nginx/ssl/*.crt
+*.p12
+*.pfx
 
+# Credentials
+credentials.json
+secrets.json
+api_key*
+apikey*
+
+# ============================================================================
+# LOGS & BACKUPS
+# ============================================================================
 logs/
 *.log
 
@@ -13,9 +30,15 @@ backups/
 *.sql
 *.sql.gz
 *.tar.gz
+max-backend-backup-*
 
+# ============================================================================
+# DATA & VOLUMES
+# ============================================================================
 data/
 volumes/
+conversations/
+sessions/
 
 .DS_Store
 Thumbs.db

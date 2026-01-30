@@ -1,6 +1,6 @@
 FROM node:20-alpine
 
-RUN apk update && apk upgrade && apk add --no-cache curl
+RUN apk update && apk upgrade && apk add --no-cache curl docker-cli
 
 WORKDIR /app
 
@@ -11,6 +11,7 @@ COPY . .
 
 RUN mkdir -p logs conversations data && chown -R node:node /app
 
+RUN addgroup -g 988 dockerhost && addgroup node dockerhost
 USER node
 
 EXPOSE 3005
