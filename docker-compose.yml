@@ -33,10 +33,19 @@ services:
       - SMTP_PASSWORD=${SMTP_PASSWORD}
       - SMTP_FROM=${SMTP_FROM}
       - TOKENS_BUDGET_TOTAL=${TOKENS_BUDGET_TOTAL:-20000000}
+      - DATABASE_URL=${DATABASE_URL}
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
+      - FORCE_IPV4=true
+      - CRON_SECRET_KEY=${CRON_SECRET_KEY}
+      - CREDENTIALS_ENCRYPTION_KEY=${CREDENTIALS_ENCRYPTION_KEY}
+      - ESPO_LAYOUTS_PATH=/bitnami/espocrm/custom/Espo/Custom/Resources/layouts
+      - CRM_ENV=prod
     volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
       - max-logs:/app/logs
       - max-conversations:/app/conversations
       - max-data:/app/data
+      - espocrm-data:/bitnami/espocrm:rw
     networks:
       - max-network
     depends_on:
