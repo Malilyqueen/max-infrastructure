@@ -23,8 +23,8 @@ services:
       - ESPO_USERNAME=${ESPO_USERNAME}
       - ESPO_PASSWORD=${ESPO_PASSWORD}
       - GREENAPI_BASE_URL=https://api.green-api.com
-      - GREENAPI_INSTANCE_ID=${GREENAPI_INSTANCE_ID}
-      - GREENAPI_API_TOKEN=${GREENAPI_API_TOKEN}
+      # - GREENAPI_INSTANCE_ID=${GREENAPI_INSTANCE_ID}
+      # - GREENAPI_API_TOKEN=${GREENAPI_API_TOKEN}
       - MAX_BASE_URL=https://max-api.studiomacrea.cloud
       - JWT_SECRET=${JWT_SECRET}
       - SMTP_HOST=${SMTP_HOST}
@@ -34,8 +34,8 @@ services:
       - SMTP_FROM=${SMTP_FROM}
       - MAILJET_API_KEY=${MAILJET_API_KEY}
       - MAILJET_API_SECRET=${MAILJET_API_SECRET}
-      - MAILJET_FROM_EMAIL=${MAILJET_FROM_EMAIL}
-      - MAILJET_FROM_NAME=${MAILJET_FROM_NAME}
+      # - MAILJET_FROM_EMAIL=${MAILJET_FROM_EMAIL}
+      # - MAILJET_FROM_NAME=${MAILJET_FROM_NAME}
       - TOKENS_BUDGET_TOTAL=${TOKENS_BUDGET_TOTAL:-20000000}
       - DATABASE_URL=${DATABASE_URL}
       - DATABASE_PASSWORD=${DATABASE_PASSWORD}
@@ -46,6 +46,22 @@ services:
       - CREDENTIALS_ENCRYPTION_KEY=${CREDENTIALS_ENCRYPTION_KEY}
       - ESPO_LAYOUTS_PATH=/bitnami/espocrm/custom/Espo/Custom/Resources/layouts
       - CRM_ENV=prod
+      # Chemins Linux persistants (montés sur volume)
+      - TASKS_DIR=/app/data/tasks_autogen
+      - TASK_REGISTRY_PATH=/app/data/task_registry.json
+      # Sécurité - forcé par BOOT GUARD
+      - ALLOW_RESET=false
+      # Budget et historique
+      - TOKENS_BUDGET_TOTAL=${TOKENS_BUDGET_TOTAL:-20000000}
+      - MAX_HISTORY_DURATION_HOURS=${MAX_HISTORY_DURATION_HOURS:-72}
+      - MAX_HISTORY_MESSAGES=${MAX_HISTORY_MESSAGES:-100}
+      # Multi-tenant
+      - ESPO_HAS_TENANT_FIELD=${ESPO_HAS_TENANT_FIELD:-true}
+      - ENFORCE_TENANT_ISOLATION=${ENFORCE_TENANT_ISOLATION:-true}
+      # Sentry Error Tracking (optionnel)
+      - SENTRY_DSN=${SENTRY_DSN:-}
+      - SENTRY_SAMPLE_RATE=${SENTRY_SAMPLE_RATE:-1.0}
+      - APP_VERSION=${APP_VERSION:-1.0.0}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - max-logs:/app/logs
@@ -129,6 +145,40 @@ services:
     depends_on:
       - max-backend
       - espocrm
+
+  # ════════════════════════════════════════════════════════════════════
+  # BACKUP CRON - Backup automatique quotidien à 3h du matin
+  # ════════════════════════════════════════════════════════════════════
+  backup:
+    image: alpine:latest
+    container_name: max-backup
+    restart: unless-stopped
+    entrypoint: /bin/sh
+    command: >
+      -c "
+        apk add --no-cache bash mysql-client aws-cli &&
+        echo '0 3 * * * /scripts/backup.sh >> /var/log/backup-cron.log 2>&1' | crontab - &&
+        crond -f -l 2
+      "
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - ESPO_DB_PASSWORD=${ESPO_DB_PASSWORD}
+      - SCW_ACCESS_KEY=${SCW_ACCESS_KEY:-}
+      - SCW_SECRET_KEY=${SCW_SECRET_KEY:-}
+      - SCW_S3_BUCKET=${SCW_S3_BUCKET:-max-backups}
+      - SCW_S3_ENDPOINT=${SCW_S3_ENDPOINT:-https://s3.fr-par.scw.cloud}
+      - ALERT_WEBHOOK=${ALERT_WEBHOOK:-}
+    volumes:
+      - ./scripts:/scripts:ro
+      - ./backups:/opt/max-infrastructure/backups
+      - espocrm-data:/espocrm-data:ro
+      - max-data:/max-data:ro
+      - max-logs:/max-logs:ro
+      - max-conversations:/max-conversations:ro
+    networks:
+      - max-network
+    depends_on:
+      - mariadb
 
 networks:
   max-network:
